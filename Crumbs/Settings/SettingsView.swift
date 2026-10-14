@@ -40,6 +40,10 @@ struct GeneralSettingsPane: View {
                     Text("Record where captures come from")
                     Text("Saves the app, window title and link with each note, in your Markdown file.")
                 }
+                Toggle(isOn: $settings.keepPanelOnTop) {
+                    Text("Keep the panel on top")
+                    Text("Float above other windows. When off, other apps can cover it, and your panel shortcut brings it back.")
+                }
             }
 
             Section("Notes") {
