@@ -636,6 +636,37 @@ struct PanelModelTests {
         }
     }
 
+    @Test func copyAsListCanIncludeSourceLinks() throws {
+        try withModel { fixture in
+            let page = CaptureSource(app: "Safari", url: URL(string: "https://www.example.com/a"), capturedAt: .now)
+            let paren = CaptureSource(app: "Chrome", url: URL(string: "https://en.wikipedia.org/wiki/A_(b)"), capturedAt: .now)
+            let file = CaptureSource(app: "Preview", url: URL(filePath: "/Users/me/Paper.pdf"), capturedAt: .now)
+            let a = try #require(fixture.store.addNote("Linked\nsecond line", sources: [page, paren]))
+            let b = try #require(fixture.store.addNote("Local file only", sources: [file]))
+            let c = try added(fixture.store, "Typed")
+
+            fixture.model.copyAsList([a, b, c])
+            let withoutLinks = fixture.model.pasteboard.string(forType: .string)
+
+            fixture.model.settings.includeSourceLinksInCopyAsList = true
+            fixture.model.copyAsList([a, b, c])
+            let withLinks = fixture.model.pasteboard.string(forType: .string)
+
+            #expect(withoutLinks == """
+            1. Linked
+               second line
+            2. Local file only
+            3. Typed
+            """)
+            #expect(withLinks == """
+            1. Linked
+               second line ([example.com](https://www.example.com/a), [en.wikipedia.org](<https://en.wikipedia.org/wiki/A_(b)>))
+            2. Local file only
+            3. Typed
+            """)
+        }
+    }
+
     @Test func searchAndHideDoneFilterVisibleNotes() throws {
         try withModel { fixture in
             let done = try added(fixture.store, "Config done")

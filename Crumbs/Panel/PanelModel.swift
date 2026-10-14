@@ -260,6 +260,21 @@ final class PanelModel {
         showToast("Copied Link", systemImage: "link")
     }
 
+    /// The note's web sources as Markdown links, e.g. "[example.com](https://example.com/a)".
+    /// Local file links are left out: they mean nothing to whoever reads the chat.
+    static func sourceLinks(for note: Note) -> String? {
+        var seen: Set<URL> = []
+        let links = note.metadata.sources.compactMap { source -> String? in
+            guard let url = source.url, !url.isFileURL, seen.insert(url).inserted else { return nil }
+            let label = (source.place ?? url.absoluteString)
+                .replacingOccurrences(of: "[", with: "\\[")
+                .replacingOccurrences(of: "]", with: "\\]")
+            let target = url.absoluteString.contains(")") ? "<\(url.absoluteString)>" : url.absoluteString
+            return "[\(label)](\(target))"
+        }
+        return links.isEmpty ? nil : links.joined(separator: ", ")
+    }
+
     /// Copies notes as a numbered list, ready to paste into a chat.
     func copyAsList(_ ids: [Note.ID]) {
         let ordered = store.ordered(ids)
@@ -268,8 +283,12 @@ final class PanelModel {
             showToast("Select notes to copy", systemImage: "info.circle")
             return
         }
+        let includeLinks = settings.includeSourceLinksInCopyAsList
         let list = notes.enumerated().map { index, note in
-            let lines = note.text.split(separator: "\n", omittingEmptySubsequences: false)
+            var lines = note.text.split(separator: "\n", omittingEmptySubsequences: false).map(String.init)
+            if includeLinks, let links = Self.sourceLinks(for: note), !lines.isEmpty {
+                lines[lines.count - 1] += " (\(links))"
+            }
             let marker = "\(index + 1). "
             let indent = String(repeating: " ", count: marker.count)
             let rest = lines.dropFirst().map { $0.isEmpty ? "" : indent + $0 }
