@@ -77,6 +77,11 @@ final class AppSettings {
         didSet { defaults.set(markDoneAfterCopyAsList, forKey: Keys.markDoneAfterCopyAsList) }
     }
 
+    /// Add each note's web links after it in Copy as List.
+    var includeSourceLinksInCopyAsList: Bool {
+        didSet { defaults.set(includeSourceLinksInCopyAsList, forKey: Keys.includeSourceLinksInCopyAsList) }
+    }
+
     var hideDoneNotes: Bool {
         didSet { defaults.set(hideDoneNotes, forKey: Keys.hideDoneNotes) }
     }
@@ -107,6 +112,7 @@ final class AppSettings {
         recordCaptureSource = defaults.object(forKey: Keys.recordCaptureSource) as? Bool ?? true
         keepPanelOnTop = defaults.object(forKey: Keys.keepPanelOnTop) as? Bool ?? true
         markDoneAfterCopyAsList = defaults.object(forKey: Keys.markDoneAfterCopyAsList) as? Bool ?? true
+        includeSourceLinksInCopyAsList = defaults.bool(forKey: Keys.includeSourceLinksInCopyAsList)
         hideDoneNotes = defaults.bool(forKey: Keys.hideDoneNotes)
         storageFolder = defaults.string(forKey: Keys.storageFolder).map { URL(filePath: $0, directoryHint: .isDirectory) }
             ?? Self.defaultStorageFolder
@@ -125,6 +131,7 @@ final class AppSettings {
         static let recordCaptureSource = "recordCaptureSource"
         static let keepPanelOnTop = "keepPanelOnTop"
         static let markDoneAfterCopyAsList = "markDoneAfterCopyAsList"
+        static let includeSourceLinksInCopyAsList = "includeSourceLinksInCopyAsList"
         static let hideDoneNotes = "hideDoneNotes"
         static let storageFolder = "storageFolder"
         static let activeList = "activeList"

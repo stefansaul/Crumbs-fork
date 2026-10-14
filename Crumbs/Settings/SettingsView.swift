@@ -51,6 +51,10 @@ struct GeneralSettingsPane: View {
                     Text("Mark notes as done after Copy as List")
                     Text("Notes you send to a chat are checked off automatically.")
                 }
+                Toggle(isOn: $settings.includeSourceLinksInCopyAsList) {
+                    Text("Include source links in Copy as List")
+                    Text("Adds the web page each note came from, so the chat can see it too.")
+                }
                 Toggle(isOn: $settings.hideDoneNotes) {
                     Text("Hide done notes")
                     Text("Done notes stay in your Markdown file until you clear them.")
